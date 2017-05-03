@@ -23,6 +23,9 @@
     [self testClassResponse];
     [self testinstanceMethodForInstanceSelector];
     [self testinstanceMethodForClassSelector];
+    [self testClassObjectMethodForSelector];
+    [self testInstanceObjectMethodForSelector];
+    [self testClassObjectMethodForSelectorWith2params];
     return YES;
 }
 
@@ -72,6 +75,46 @@
     NSMethodSignature *classSign = [BTSignatureObject instanceMethodSignatureForSelector:selector];
     NSLog(@"%s \n classSign = %@ \n",__FUNCTION__,  classSign);
 }
+
+- (void)testClassObjectMethodForSelector {
+    SEL selector1 = NSSelectorFromString(@"testThird");
+    SEL selector2 = NSSelectorFromString(@"testForth");
+    IMP imp1 = [BTSignatureObject methodForSelector:selector1];
+    IMP imp2 = [BTSignatureObject methodForSelector:selector2];
+    typedef id (*send_message)(void *, SEL);
+    send_message sendMessage2 = (send_message)imp2;
+    NSLog(@"%s \n imp1 = %p \n imp2 = %p \n", __FUNCTION__, imp1, imp2);
+//    imp2();
+    id result = sendMessage2((__bridge void *)([BTSignatureObject class]), selector2);
+    NSLog(@"result = %@", result);
+}
+
+- (void)testInstanceObjectMethodForSelector {
+    BTSignatureObject *object = [BTSignatureObject new];
+    SEL selector1 = NSSelectorFromString(@"testThird");
+    SEL selector2 = NSSelectorFromString(@"testForth");
+    IMP imp1 = [object methodForSelector:selector1];
+    IMP imp2 = [object methodForSelector:selector2];
+    NSLog(@"%s \n imp1 = %p \n imp2 = %p \n", __FUNCTION__, imp1, imp2);
+    typedef id (*send_message)(void *, SEL);
+    send_message sendMessage1 = (send_message)imp1;
+//    imp1();
+//    id result = sendMessage1((__bridge void *)(object), selector1);
+    id result = sendMessage1(nil, nil);
+    NSLog(@"result = %@", result);
+
+}
+
+- (void)testClassObjectMethodForSelectorWith2params {
+    SEL selector1 = NSSelectorFromString(@"testFifth:lists:");
+    IMP imp1 = [BTSignatureObject methodForSelector:selector1];
+    typedef id (*send_message)(void *, SEL, id, id);
+    send_message sendMessage2 = (send_message)imp1;
+    NSLog(@"%s \n imp1 = %p \n", __FUNCTION__, imp1);
+    id result = sendMessage2((__bridge void *)([BTSignatureObject class]), selector1, @"testTes", @[@"one", @"two"]);
+    NSLog(@"result = %@", result);
+}
+
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.

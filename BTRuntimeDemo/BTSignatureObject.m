@@ -18,4 +18,19 @@
     NSLog(@"testSecond");
 }
 
+
+- (id)testThird {
+    NSLog(@"testThird");
+    return @"testThird";
+}
+
++ (id)testForth {
+    NSLog(@"testForth");
+    return @"testForth";
+}
+
++ (id)testFifth:(NSString *)arg1 lists:(NSArray *)lists {
+    NSLog(@"testFifth: arg1 = %@, lists = %@", arg1, lists);
+    return [NSObject new];
+}
 @end
